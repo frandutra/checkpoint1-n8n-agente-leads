@@ -1,0 +1,186 @@
+{
+  "name": "checkpoint1_francisco_dutra",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "chat-trigger",
+      "name": "Chat Trigger",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        300
+      ],
+      "webhookId": "7d8eca71-0795-4e99-a3a5-3888606b0edf"
+    },
+    {
+      "parameters": {
+        "promptType": "auto",
+        "options": {
+          "maxIterations": 8,
+          "returnIntermediateSteps": true,
+          "systemMessage": "## ROL\nSos el Asistente de Calificacion de Leads de la empresa. Operas como primer filtro comercial: recibis mensajes desestructurados de potenciales clientes y los conviertes en un lead estructurado y puntuado.\n\n## AMBITO\nTu alcance se limita EXCLUSIVAMENTE a: (a) entender la consulta del prospecto, (b) extraer datos de contacto y senales de intencion de compra, (c) asignar un score de calificacion de 0 a 100, y (d) registrar el lead calificado en la planilla mediante la herramienta conectada. No abordas soporte tecnico, facturacion, ni temas ajenos a la captacion comercial.\n\n## OBJETIVO\nMaximizar la cantidad de leads correctamente calificados y registrados, priorizando la precision de los datos por sobre la velocidad. Para cada lead determinas: Nombre, Email, Empresa, nivel de Interes (Alto/Medio/Bajo) y un Score numerico justificado.\n\n## REGLAS DE ACCION\n- Usa la herramienta \"Registrar Lead en Google Sheets\" UNICAMENTE cuando hayas reunido como minimo un nombre y un medio de contacto (email) y exista una intencion comercial real.\n- Si faltan datos criticos, primero pedilos al usuario en un solo mensaje claro; no inventes ni completes datos con suposiciones (mitigacion de alucinaciones).\n- Responde siempre en espanol neutro profesional. Queda terminantemente prohibido el uso de lenguaje inclusivo o desdoblamientos (no usar @, x, e ni formas como 'todos y todas').\n- Se conciso: maximo 5 lineas por respuesta al usuario.\n\n## RESTRICCIONES (lo que NO tenes permitido hacer)\n- NO prometer precios, descuentos, plazos de entrega ni condiciones contractuales.\n- NO modificar ni borrar filas existentes; solo agregar (append) leads nuevos.\n- NO ejecutar ninguna otra accion fuera de la herramienta de planilla autorizada.\n\n## ESCALAMIENTO\nSi el prospecto solicita hablar con una persona, plantea una negociacion de precio, o expresa una queja formal, registra igualmente el lead con Interes 'Alto' y en tu respuesta indica que un asesor humano del equipo comercial tomara el contacto. No intentes resolver vos esos casos."
+        }
+      },
+      "id": "ai-agent",
+      "name": "AI Agent - Calificacion de Leads",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        320,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "id": "gemini-model",
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        200,
+        540
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "5zQrWvPub7D0npyD",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Usa esta herramienta para REGISTRAR un lead comercial ya calificado en la planilla maestra de leads (Google Sheets), agregando una fila nueva (append). Debes activarla de forma autonoma SOLO cuando se cumplan TODAS estas condiciones de negocio: (1) el mensaje del prospecto demuestra una intencion comercial real (pide cotizacion, demo, informacion de un producto/servicio, o agendar una reunion comercial); (2) ya reuniste como minimo el Nombre del contacto y un Email valido; (3) pudiste inferir o consultar el nivel de Interes (Alto/Medio/Bajo) y calcular un Score de 0 a 100. NO la actives para preguntas genericas sin datos de contacto, para consultas de soporte tecnico, ni cuando falten el nombre o el email (en ese caso primero pedi esos datos al usuario). Cada invocacion agrega un unico lead nuevo; nunca la uses para editar o borrar filas existentes. Parametros esperados: Nombre, Email, Empresa, Interes y Score.",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1YBK28e0LO0w8IkB5RWIL6_MIonnoHFzdqFYUkTVNvrA",
+          "mode": "id",
+          "cachedResultName": "Leads - Calificacion"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Nombre": "={{ $fromAI('Nombre', 'Nombre completo del lead', 'string') }}",
+            "Email": "={{ $fromAI('Email', 'Correo electronico de contacto del lead', 'string') }}",
+            "Empresa": "={{ $fromAI('Empresa', 'Empresa u organizacion del lead', 'string') }}",
+            "Interes": "={{ $fromAI('Interes', 'Nivel de interes comercial: Alto, Medio o Bajo', 'string') }}",
+            "Score": "={{ $fromAI('Score', 'Puntaje de calificacion del lead de 0 a 100', 'number') }}"
+          },
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "id": "sheets-tool",
+      "name": "Registrar Lead en Google Sheets",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        460,
+        540
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Q0q5Jbf3IE9Ybz8M",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "sendTo": "fdutra2001@gmail.com",
+        "subject": "=[Observabilidad Agente Leads] Ejecucion {{ $now }}",
+        "emailType": "text",
+        "message": "=REPORTE AUTOMATICO DE SUPERVISION HUMANA\n\n--- Respuesta final del agente ---\n{{ $json.output }}\n\n--- Auditoria del razonamiento (Execution Log / pasos intermedios) ---\n{{ JSON.stringify($json.intermediateSteps, null, 2) }}",
+        "options": {}
+      },
+      "id": "gmail-log",
+      "name": "Reporte Observabilidad (Gmail)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        720,
+        300
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YDs1cl0nubGd1P1d",
+          "name": "Gmail account"
+        }
+      },
+      "webhookId": "af2969e7-5b1e-4040-9860-a92092a851a7"
+    }
+  ],
+  "connections": {
+    "Chat Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent - Calificacion de Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent - Calificacion de Leads",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registrar Lead en Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent - Calificacion de Leads",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent - Calificacion de Leads": {
+      "main": [
+        [
+          {
+            "node": "Reporte Observabilidad (Gmail)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Argentina/Buenos_Aires"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": []
+}
