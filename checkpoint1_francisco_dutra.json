@@ -11,17 +11,16 @@
       "typeVersion": 1.1,
       "position": [
         0,
-        300
+        304
       ],
       "webhookId": "7d8eca71-0795-4e99-a3a5-3888606b0edf"
     },
     {
       "parameters": {
-        "promptType": "auto",
         "options": {
+          "systemMessage": "## ROL\nSos el Asistente de Calificacion de Leads de la empresa. Operas como primer filtro comercial: recibis mensajes desestructurados de potenciales clientes y los conviertes en un lead estructurado y puntuado.\n\n## AMBITO\nTu alcance se limita EXCLUSIVAMENTE a: (a) entender la consulta del prospecto, (b) extraer datos de contacto y senales de intencion de compra, (c) asignar un score de calificacion de 0 a 100, y (d) registrar el lead calificado en la planilla mediante la herramienta conectada. No abordas soporte tecnico, facturacion, ni temas ajenos a la captacion comercial.\n\n## OBJETIVO\nMaximizar la cantidad de leads correctamente calificados y registrados, priorizando la precision de los datos por sobre la velocidad. Para cada lead determinas: Nombre, Email, Empresa, nivel de Interes (Alto/Medio/Bajo) y un Score numerico justificado.\n\n## REGLAS DE ACCION\n- Usa la herramienta \"Registrar Lead en Google Sheets\" UNICAMENTE cuando hayas reunido como minimo un nombre y un medio de contacto (email) y exista una intencion comercial real.\n- Si faltan datos criticos, primero pedilos al usuario en un solo mensaje claro; no inventes ni completes datos con suposiciones (mitigacion de alucinaciones).\n- Responde siempre en espanol neutro profesional. Queda terminantemente prohibido el uso de lenguaje inclusivo o desdoblamientos (no usar @, x, e ni formas como 'todos y todas').\n- Se conciso: maximo 5 lineas por respuesta al usuario.\n\n## RESTRICCIONES (lo que NO tenes permitido hacer)\n- NO prometer precios, descuentos, plazos de entrega ni condiciones contractuales.\n- NO modificar ni borrar filas existentes; solo agregar (append) leads nuevos.\n- NO ejecutar ninguna otra accion fuera de la herramienta de planilla autorizada.\n\n## ESCALAMIENTO\nSi el prospecto solicita hablar con una persona, plantea una negociacion de precio, o expresa una queja formal, registra igualmente el lead con Interes 'Alto' y en tu respuesta indica que un asesor humano del equipo comercial tomara el contacto. No intentes resolver vos esos casos.",
           "maxIterations": 8,
-          "returnIntermediateSteps": true,
-          "systemMessage": "## ROL\nSos el Asistente de Calificacion de Leads de la empresa. Operas como primer filtro comercial: recibis mensajes desestructurados de potenciales clientes y los conviertes en un lead estructurado y puntuado.\n\n## AMBITO\nTu alcance se limita EXCLUSIVAMENTE a: (a) entender la consulta del prospecto, (b) extraer datos de contacto y senales de intencion de compra, (c) asignar un score de calificacion de 0 a 100, y (d) registrar el lead calificado en la planilla mediante la herramienta conectada. No abordas soporte tecnico, facturacion, ni temas ajenos a la captacion comercial.\n\n## OBJETIVO\nMaximizar la cantidad de leads correctamente calificados y registrados, priorizando la precision de los datos por sobre la velocidad. Para cada lead determinas: Nombre, Email, Empresa, nivel de Interes (Alto/Medio/Bajo) y un Score numerico justificado.\n\n## REGLAS DE ACCION\n- Usa la herramienta \"Registrar Lead en Google Sheets\" UNICAMENTE cuando hayas reunido como minimo un nombre y un medio de contacto (email) y exista una intencion comercial real.\n- Si faltan datos criticos, primero pedilos al usuario en un solo mensaje claro; no inventes ni completes datos con suposiciones (mitigacion de alucinaciones).\n- Responde siempre en espanol neutro profesional. Queda terminantemente prohibido el uso de lenguaje inclusivo o desdoblamientos (no usar @, x, e ni formas como 'todos y todas').\n- Se conciso: maximo 5 lineas por respuesta al usuario.\n\n## RESTRICCIONES (lo que NO tenes permitido hacer)\n- NO prometer precios, descuentos, plazos de entrega ni condiciones contractuales.\n- NO modificar ni borrar filas existentes; solo agregar (append) leads nuevos.\n- NO ejecutar ninguna otra accion fuera de la herramienta de planilla autorizada.\n\n## ESCALAMIENTO\nSi el prospecto solicita hablar con una persona, plantea una negociacion de precio, o expresa una queja formal, registra igualmente el lead con Interes 'Alto' y en tu respuesta indica que un asesor humano del equipo comercial tomara el contacto. No intentes resolver vos esos casos."
+          "returnIntermediateSteps": true
         }
       },
       "id": "ai-agent",
@@ -30,7 +29,7 @@
       "typeVersion": 3.1,
       "position": [
         320,
-        300
+        304
       ]
     },
     {
@@ -43,8 +42,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1.1,
       "position": [
-        200,
-        540
+        208,
+        544
       ],
       "credentials": {
         "googlePalmApi": {
@@ -60,15 +59,17 @@
         "operation": "append",
         "documentId": {
           "__rl": true,
-          "value": "1YBK28e0LO0w8IkB5RWIL6_MIonnoHFzdqFYUkTVNvrA",
-          "mode": "id",
-          "cachedResultName": "Leads - Calificacion"
+          "value": "1U3WC2tFsd2RVWdWAU6Kr-GGhYqHhiDNmwIdmhnI6Vx8",
+          "mode": "list",
+          "cachedResultName": "Leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1U3WC2tFsd2RVWdWAU6Kr-GGhYqHhiDNmwIdmhnI6Vx8/edit?usp=drivesdk"
         },
         "sheetName": {
           "__rl": true,
           "value": "gid=0",
           "mode": "list",
-          "cachedResultName": "Hoja 1"
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1U3WC2tFsd2RVWdWAU6Kr-GGhYqHhiDNmwIdmhnI6Vx8/edit#gid=0"
         },
         "columns": {
           "mappingMode": "defineBelow",
@@ -80,7 +81,53 @@
             "Score": "={{ $fromAI('Score', 'Puntaje de calificacion del lead de 0 a 100', 'number') }}"
           },
           "matchingColumns": [],
-          "schema": [],
+          "schema": [
+            {
+              "id": "Nombre",
+              "displayName": "Nombre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Empresa",
+              "displayName": "Empresa",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Interes",
+              "displayName": "Interes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Score",
+              "displayName": "Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
           "attemptToConvertTypes": false,
           "convertFieldsToString": true
         },
@@ -91,8 +138,8 @@
       "type": "n8n-nodes-base.googleSheetsTool",
       "typeVersion": 4.7,
       "position": [
-        460,
-        540
+        464,
+        544
       ],
       "credentials": {
         "googleSheetsOAuth2Api": {
@@ -103,8 +150,6 @@
     },
     {
       "parameters": {
-        "resource": "message",
-        "operation": "send",
         "sendTo": "fdutra2001@gmail.com",
         "subject": "=[Observabilidad Agente Leads] Ejecucion {{ $now }}",
         "emailType": "text",
@@ -117,15 +162,15 @@
       "typeVersion": 2.1,
       "position": [
         720,
-        300
+        304
       ],
+      "webhookId": "af2969e7-5b1e-4040-9860-a92092a851a7",
       "credentials": {
         "gmailOAuth2": {
           "id": "YDs1cl0nubGd1P1d",
           "name": "Gmail account"
         }
-      },
-      "webhookId": "af2969e7-5b1e-4040-9860-a92092a851a7"
+      }
     }
   ],
   "connections": {
@@ -176,7 +221,8 @@
   },
   "settings": {
     "executionOrder": "v1",
-    "timezone": "America/Argentina/Buenos_Aires"
+    "timezone": "America/Argentina/Buenos_Aires",
+    "binaryMode": "separate"
   },
   "pinData": {},
   "meta": {
